@@ -120,7 +120,6 @@ class BiasGuardOrchestrator:
         graph.add_node("mitigate", self._mitigate_node)
         graph.add_node("score", self._score_node)
         graph.add_node("finalize", self._finalize_node)
-        graph.add_node("handle_error", self._error_node)
 
         # Entry point
         graph.set_entry_point("retrieve")
@@ -131,7 +130,6 @@ class BiasGuardOrchestrator:
         graph.add_edge("mitigate", "score")
         graph.add_edge("score", "finalize")
         graph.add_edge("finalize", END)
-        graph.add_edge("handle_error", END)
 
         return graph.compile()
 

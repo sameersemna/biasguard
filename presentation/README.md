@@ -290,7 +290,7 @@ curl -X POST http://localhost:8000/analyze \
   -d '{
     "text": "We need a young, energetic rockstar developer...",
     "doc_type": "job_description",
-    "llm_provider": "anthropic"
+    "llm_provider": "openai"
   }'
 
 # Or use the Python client

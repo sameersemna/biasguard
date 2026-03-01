@@ -1,4 +1,5 @@
 # BiasGuard 🛡️ — Bias-Detection RAG Agent for Hiring
+## by Unbiased Talent
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?logo=fastapi)](https://fastapi.tiangolo.com)
@@ -288,7 +289,7 @@ curl -X POST http://localhost:8000/analyze \
   -d '{
     "text": "We need a young, energetic rockstar developer...",
     "doc_type": "job_description",
-    "llm_provider": "anthropic"
+    "llm_provider": "openai"
   }'
 
 # Or use the Python client

@@ -13,6 +13,9 @@ services:
     container_name: biasguard-api
     ports:
       - "8000:8000"
+    # Environment variables are passed from the host's .env file, with defaults where appropriate
+    env_file:
+      - .env
     environment:
       - LLM_PROVIDER=${LLM_PROVIDER:-anthropic}
       - LLM_MODEL=${LLM_MODEL:-claude-3-5-sonnet-20241022}
