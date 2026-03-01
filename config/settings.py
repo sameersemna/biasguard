@@ -80,7 +80,7 @@ class Settings(BaseSettings):
     api_port: int = 8000
     api_secret_key: str = "change-me"
     api_debug: bool = False
-    allowed_origins: list[str] = ["http://localhost:8501"]
+    allowed_origins: str = "http://localhost:8501"
     rate_limit_per_minute: int = 60
 
     # ── Observability ──────────────────────────────────────
@@ -113,17 +113,13 @@ class Settings(BaseSettings):
     retrieval_k: int = 10
     retrieval_score_threshold: float = 0.7
 
-    @field_validator("allowed_origins", mode="before")
-    @classmethod
-    def parse_origins(cls, v: str | list) -> list[str]:
-        if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
-        return v
-
     @field_validator("chroma_persist_dir", "log_file", "reports_dir", mode="before")
     @classmethod
     def ensure_path(cls, v: str | Path) -> Path:
         return Path(v)
+
+    def get_allowed_origins(self) -> list[str]:
+        return [origin.strip() for origin in self.allowed_origins.split(",") if origin.strip()]
 
     def get_active_llm_api_key(self) -> str:
         key_map = {

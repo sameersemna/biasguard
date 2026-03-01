@@ -1,5 +1,3 @@
-version: "3.9"
-
 # ============================================================
 # BiasGuard — Docker Compose
 # Local development stack: API + Frontend + Monitoring
