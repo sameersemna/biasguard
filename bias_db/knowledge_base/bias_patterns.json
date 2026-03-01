@@ -1,0 +1,848 @@
+{
+  "version": "1.0.0",
+  "description": "BiasGuard Bias Pattern Knowledge Base — 200+ indicators across 8 categories",
+  "categories": {
+    "GENDER_BIAS": {
+      "description": "Language that signals preference for a specific gender or uses gendered stereotypes",
+      "eeoc_reference": "Title VII of Civil Rights Act 1964 — Sex Discrimination",
+      "patterns": [
+        {
+          "id": "GB001",
+          "term": "rockstar",
+          "severity": "MEDIUM",
+          "explanation": "Male-coded term that reduces female applicant pool by up to 18% (Gaucher et al., 2011)",
+          "neutral_alternatives": ["exceptional performer", "high achiever", "outstanding contributor"],
+          "context": "job_description"
+        },
+        {
+          "id": "GB002",
+          "term": "ninja",
+          "severity": "MEDIUM",
+          "explanation": "Male-coded language that discourages women from applying",
+          "neutral_alternatives": ["expert", "specialist", "highly skilled"],
+          "context": "job_description"
+        },
+        {
+          "id": "GB003",
+          "term": "guru",
+          "severity": "LOW",
+          "explanation": "Male-coded term with lower appeal to female applicants",
+          "neutral_alternatives": ["expert", "authority", "specialist"],
+          "context": "job_description"
+        },
+        {
+          "id": "GB004",
+          "term": "dominant",
+          "severity": "MEDIUM",
+          "explanation": "Male-coded adjective linked to in-group favoritism in hiring research",
+          "neutral_alternatives": ["leading", "primary", "key"],
+          "context": "job_description"
+        },
+        {
+          "id": "GB005",
+          "term": "aggressive",
+          "severity": "HIGH",
+          "explanation": "Male-coded; applied negatively to women displaying same trait (double-bind bias)",
+          "neutral_alternatives": ["results-oriented", "driven", "proactive"],
+          "context": "job_description"
+        },
+        {
+          "id": "GB006",
+          "term": "strong",
+          "severity": "LOW",
+          "explanation": "Masculine-coded when used without context; borderline",
+          "neutral_alternatives": ["effective", "capable", "competent"],
+          "context": "job_description"
+        },
+        {
+          "id": "GB007",
+          "term": "manpower",
+          "severity": "HIGH",
+          "explanation": "Explicitly gendered; excludes non-male workers",
+          "neutral_alternatives": ["workforce", "staff", "team", "personnel"],
+          "context": "any"
+        },
+        {
+          "id": "GB008",
+          "term": "salesman",
+          "severity": "HIGH",
+          "explanation": "Gendered job title; use gender-neutral form",
+          "neutral_alternatives": ["sales representative", "sales associate", "account executive"],
+          "context": "any"
+        },
+        {
+          "id": "GB009",
+          "term": "chairman",
+          "severity": "HIGH",
+          "explanation": "Gendered role title",
+          "neutral_alternatives": ["chair", "chairperson", "board chair"],
+          "context": "any"
+        },
+        {
+          "id": "GB010",
+          "term": "nurturing",
+          "severity": "MEDIUM",
+          "explanation": "Female-coded stereotype; implies gender expectations for roles",
+          "neutral_alternatives": ["supportive", "mentoring", "collaborative"],
+          "context": "job_description"
+        },
+        {
+          "id": "GB011",
+          "term": "competitive",
+          "severity": "MEDIUM",
+          "explanation": "Male-coded trait; women who are competitive often penalized",
+          "neutral_alternatives": ["goal-oriented", "achievement-focused"],
+          "context": "job_description"
+        },
+        {
+          "id": "GB012",
+          "term": "he or she",
+          "severity": "MEDIUM",
+          "explanation": "Binary gender assumption; excludes non-binary candidates",
+          "neutral_alternatives": ["they", "the candidate", "team members"],
+          "context": "any"
+        },
+        {
+          "id": "GB013",
+          "term": "ladies and gentlemen",
+          "severity": "MEDIUM",
+          "explanation": "Binary gender framing in communications",
+          "neutral_alternatives": ["everyone", "colleagues", "team"],
+          "context": "any"
+        },
+        {
+          "id": "GB014",
+          "term": "maternity",
+          "severity": "LOW",
+          "explanation": "May signal gender-specific leave concerns; use parental",
+          "neutral_alternatives": ["parental leave", "family leave"],
+          "context": "any"
+        },
+        {
+          "id": "GB015",
+          "term": "decisive",
+          "severity": "LOW",
+          "explanation": "Male-coded leadership term",
+          "neutral_alternatives": ["clear decision-maker", "resolute", "action-oriented"],
+          "context": "job_description"
+        },
+        {
+          "id": "GB016",
+          "term": "independent",
+          "severity": "LOW",
+          "explanation": "Male-coded when contrasted with collaborative in JD context",
+          "neutral_alternatives": ["self-directed", "autonomous"],
+          "context": "job_description"
+        },
+        {
+          "id": "GB017",
+          "term": "hero",
+          "severity": "MEDIUM",
+          "explanation": "Gendered cultural archetype; male default",
+          "neutral_alternatives": ["champion", "leader", "key contributor"],
+          "context": "any"
+        },
+        {
+          "id": "GB018",
+          "term": "genius",
+          "severity": "MEDIUM",
+          "explanation": "Male-coded; women less likely to apply to roles requiring 'genius' (Leslie et al., 2015)",
+          "neutral_alternatives": ["highly capable", "innovative thinker"],
+          "context": "job_description"
+        },
+        {
+          "id": "GB019",
+          "term": "brilliant",
+          "severity": "MEDIUM",
+          "explanation": "Similar to genius; female-is-ordinary implicit association",
+          "neutral_alternatives": ["skilled", "talented", "highly capable"],
+          "context": "job_description"
+        },
+        {
+          "id": "GB020",
+          "term": "born leader",
+          "severity": "MEDIUM",
+          "explanation": "Male-default leadership prototype assumption",
+          "neutral_alternatives": ["demonstrated leadership ability", "proven leader"],
+          "context": "job_description"
+        }
+      ]
+    },
+    "AGE_BIAS": {
+      "description": "Language that favors younger candidates or disadvantages older workers",
+      "eeoc_reference": "Age Discrimination in Employment Act 1967 (ADEA) — protects workers 40+",
+      "patterns": [
+        {
+          "id": "AB001",
+          "term": "young",
+          "severity": "HIGH",
+          "explanation": "Direct age reference. Violates ADEA when used as qualification criteria",
+          "neutral_alternatives": ["enthusiastic", "motivated"],
+          "context": "job_description"
+        },
+        {
+          "id": "AB002",
+          "term": "energetic",
+          "severity": "MEDIUM",
+          "explanation": "Code word for young/age preference; implies older workers aren't energetic",
+          "neutral_alternatives": ["motivated", "high-energy", "results-driven"],
+          "context": "job_description"
+        },
+        {
+          "id": "AB003",
+          "term": "digital native",
+          "severity": "HIGH",
+          "explanation": "Code for born post-~1990; directly discriminatory under ADEA",
+          "neutral_alternatives": ["proficient with digital tools", "experienced with technology"],
+          "context": "job_description"
+        },
+        {
+          "id": "AB004",
+          "term": "recent graduate",
+          "severity": "HIGH",
+          "explanation": "Effectively limits applicants to those in their 20s. Often ADEA violation",
+          "neutral_alternatives": ["bachelor's degree required", "entry-level role with growth"],
+          "context": "job_description"
+        },
+        {
+          "id": "AB005",
+          "term": "new grad",
+          "severity": "HIGH",
+          "explanation": "Equivalent to 'recent graduate' — age discriminatory",
+          "neutral_alternatives": ["entry-level position", "0-2 years of experience welcome"],
+          "context": "job_description"
+        },
+        {
+          "id": "AB006",
+          "term": "hungry",
+          "severity": "MEDIUM",
+          "explanation": "Often used as age code; implies veterans are too comfortable",
+          "neutral_alternatives": ["motivated", "growth-oriented", "ambitious"],
+          "context": "job_description"
+        },
+        {
+          "id": "AB007",
+          "term": "up and coming",
+          "severity": "MEDIUM",
+          "explanation": "Implies early-career preference",
+          "neutral_alternatives": ["emerging", "growing in the field"],
+          "context": "any"
+        },
+        {
+          "id": "AB008",
+          "term": "overqualified",
+          "severity": "HIGH",
+          "explanation": "Frequently used as proxy for 'too old'; discriminatory in many jurisdictions",
+          "neutral_alternatives": ["We welcome candidates with advanced experience"],
+          "context": "any"
+        },
+        {
+          "id": "AB009",
+          "term": "fresh perspective",
+          "severity": "MEDIUM",
+          "explanation": "Coded language for preferring younger candidates",
+          "neutral_alternatives": ["diverse perspectives", "innovative thinking"],
+          "context": "job_description"
+        },
+        {
+          "id": "AB010",
+          "term": "graduation year",
+          "severity": "HIGH",
+          "explanation": "Requesting graduation year allows age calculation; direct ADEA risk",
+          "neutral_alternatives": ["degree in [field] required (year not required)"],
+          "context": "resume_screener"
+        },
+        {
+          "id": "AB011",
+          "term": "fast-paced",
+          "severity": "LOW",
+          "explanation": "Sometimes used as age code, but often genuinely descriptive",
+          "neutral_alternatives": ["dynamic environment", "high-growth setting"],
+          "context": "job_description"
+        },
+        {
+          "id": "AB012",
+          "term": "agile mindset",
+          "severity": "LOW",
+          "explanation": "When used as cultural proxy can disadvantage older workers",
+          "neutral_alternatives": ["adaptable", "flexible to change"],
+          "context": "job_description"
+        },
+        {
+          "id": "AB013",
+          "term": "tech-savvy",
+          "severity": "MEDIUM",
+          "explanation": "Implies age-linked technology comfort assumptions",
+          "neutral_alternatives": ["proficient in [specific tools]", "technically skilled"],
+          "context": "job_description"
+        },
+        {
+          "id": "AB014",
+          "term": "class of",
+          "severity": "HIGH",
+          "explanation": "Graduation class year enables age discrimination in screening",
+          "neutral_alternatives": ["education requirement: [degree]"],
+          "context": "resume"
+        },
+        {
+          "id": "AB015",
+          "term": "old school",
+          "severity": "HIGH",
+          "explanation": "Pejorative framing of established practices; age-coded",
+          "neutral_alternatives": ["traditional approach", "established methods"],
+          "context": "any"
+        },
+        {
+          "id": "AB016",
+          "term": "obsolete skills",
+          "severity": "HIGH",
+          "explanation": "Targeting specific older technologies to screen out experienced workers",
+          "neutral_alternatives": ["current skill requirements: [list specific tools]"],
+          "context": "job_description"
+        },
+        {
+          "id": "AB017",
+          "term": "dynamic",
+          "severity": "LOW",
+          "explanation": "Low risk but sometimes used to imply youth preference",
+          "neutral_alternatives": ["adaptable", "responsive"],
+          "context": "job_description"
+        },
+        {
+          "id": "AB018",
+          "term": "cutting-edge",
+          "severity": "LOW",
+          "explanation": "Can imply youth bias but often genuinely describes the work",
+          "neutral_alternatives": ["advanced", "current", "modern"],
+          "context": "job_description"
+        },
+        {
+          "id": "AB019",
+          "term": "years of experience cap",
+          "severity": "HIGH",
+          "explanation": "Maximum experience caps directly target older workers (e.g., '0-3 years only')",
+          "neutral_alternatives": ["entry-level role; all experience levels evaluated"],
+          "context": "job_description"
+        },
+        {
+          "id": "AB020",
+          "term": "work hard play hard",
+          "severity": "MEDIUM",
+          "explanation": "Often age-coded; assumes lifestyle alignment of younger workers",
+          "neutral_alternatives": ["we balance high performance with team wellbeing"],
+          "context": "job_description"
+        }
+      ]
+    },
+    "RACIAL_ETHNIC_BIAS": {
+      "description": "Language that disadvantages candidates based on race, ethnicity, or national origin",
+      "eeoc_reference": "Title VII — Race/Color/National Origin Discrimination",
+      "patterns": [
+        {
+          "id": "RE001",
+          "term": "culture fit",
+          "severity": "HIGH",
+          "explanation": "Most commonly cited proxy for racial in-group preference. Highly correlated with homogeneity (Rivera, 2012)",
+          "neutral_alternatives": ["values alignment", "mission alignment", "team collaboration style (specify dimensions)"],
+          "context": "any"
+        },
+        {
+          "id": "RE002",
+          "term": "native English speaker",
+          "severity": "HIGH",
+          "explanation": "Discriminates on national origin; illegal unless genuinely required for the role",
+          "neutral_alternatives": ["fluent in English", "excellent written and verbal communication"],
+          "context": "job_description"
+        },
+        {
+          "id": "RE003",
+          "term": "no accent",
+          "severity": "HIGH",
+          "explanation": "National origin discrimination; accents are legally protected characteristics",
+          "neutral_alternatives": ["clear verbal communication", "strong communication skills"],
+          "context": "any"
+        },
+        {
+          "id": "RE004",
+          "term": "articulate",
+          "severity": "MEDIUM",
+          "explanation": "When applied selectively, signals low expectation for Black candidates (racial microaggression)",
+          "neutral_alternatives": ["strong communicator", "clear presenter"],
+          "context": "any"
+        },
+        {
+          "id": "RE005",
+          "term": "well-spoken",
+          "severity": "MEDIUM",
+          "explanation": "Same as 'articulate' — frequently a racial microaggression",
+          "neutral_alternatives": ["effective communicator"],
+          "context": "any"
+        },
+        {
+          "id": "RE006",
+          "term": "pedigree",
+          "severity": "HIGH",
+          "explanation": "Socioeconomic and racial proxy; elite institutions are disproportionately white and wealthy",
+          "neutral_alternatives": ["demonstrated competence in [skills]", "relevant experience"],
+          "context": "any"
+        },
+        {
+          "id": "RE007",
+          "term": "prestigious school",
+          "severity": "HIGH",
+          "explanation": "Proxy for socioeconomic and racial exclusion",
+          "neutral_alternatives": ["accredited degree in [field]"],
+          "context": "job_description"
+        },
+        {
+          "id": "RE008",
+          "term": "exotic",
+          "severity": "HIGH",
+          "explanation": "Othering language that marks non-white candidates as foreign or unusual",
+          "neutral_alternatives": ["international", "diverse background"],
+          "context": "any"
+        },
+        {
+          "id": "RE009",
+          "term": "local candidate preferred",
+          "severity": "MEDIUM",
+          "explanation": "Can screen out immigrant communities and those from lower-income areas",
+          "neutral_alternatives": ["on-site role in [city]; relocation support available"],
+          "context": "job_description"
+        },
+        {
+          "id": "RE010",
+          "term": "culture add",
+          "severity": "LOW",
+          "explanation": "Positive evolution from 'culture fit' but still requires specificity to be non-discriminatory",
+          "neutral_alternatives": ["we seek candidates who expand our team's perspectives (specify how)"],
+          "context": "job_description"
+        },
+        {
+          "id": "RE011",
+          "term": "tribal knowledge",
+          "severity": "MEDIUM",
+          "explanation": "Appropriative term with colonial connotations",
+          "neutral_alternatives": ["institutional knowledge", "organizational expertise"],
+          "context": "any"
+        },
+        {
+          "id": "RE012",
+          "term": "spirit animal",
+          "severity": "HIGH",
+          "explanation": "Appropriation of Indigenous spiritual practice; deeply offensive",
+          "neutral_alternatives": ["role model", "inspiration", "professional inspiration"],
+          "context": "any"
+        },
+        {
+          "id": "RE013",
+          "term": "you people",
+          "severity": "HIGH",
+          "explanation": "Othering language; commonly used in racially coded contexts",
+          "neutral_alternatives": ["the team", "candidates", "applicants"],
+          "context": "interview"
+        },
+        {
+          "id": "RE014",
+          "term": "where are you really from",
+          "severity": "HIGH",
+          "explanation": "Classic national origin microaggression; implies candidate is not 'really' from stated location",
+          "neutral_alternatives": ["remove from interview scripts entirely"],
+          "context": "interview"
+        },
+        {
+          "id": "RE015",
+          "term": "whiteboard",
+          "severity": "LOW",
+          "explanation": "Low risk as terminology but whiteboard-only interviews can disadvantage neurodiverse candidates",
+          "neutral_alternatives": ["technical assessment", "collaborative problem-solving session"],
+          "context": "job_description"
+        }
+      ]
+    },
+    "DISABILITY_BIAS": {
+      "description": "Language that discriminates based on physical or mental disability",
+      "eeoc_reference": "Americans with Disabilities Act 1990 (ADA) — Disability Discrimination",
+      "patterns": [
+        {
+          "id": "DB001",
+          "term": "able-bodied",
+          "severity": "HIGH",
+          "explanation": "Direct disability discrimination unless a bona fide occupational requirement",
+          "neutral_alternatives": ["physically capable of [specific task]", "able to perform essential functions with or without accommodation"],
+          "context": "job_description"
+        },
+        {
+          "id": "DB002",
+          "term": "walk-in interview",
+          "severity": "MEDIUM",
+          "explanation": "Inaccessible for candidates with mobility impairments; not ADA compliant",
+          "neutral_alternatives": ["interviews available in accessible formats; please contact us"],
+          "context": "job_description"
+        },
+        {
+          "id": "DB003",
+          "term": "fast-learner",
+          "severity": "MEDIUM",
+          "explanation": "Can disadvantage candidates with learning disabilities; specify what learning is needed",
+          "neutral_alternatives": ["demonstrates ability to acquire new skills", "adaptable to new processes"],
+          "context": "job_description"
+        },
+        {
+          "id": "DB004",
+          "term": "high-energy",
+          "severity": "MEDIUM",
+          "explanation": "Can screen out candidates with chronic illness or fatigue conditions",
+          "neutral_alternatives": ["motivated", "productive", "results-oriented"],
+          "context": "job_description"
+        },
+        {
+          "id": "DB005",
+          "term": "must be able to stand for 8 hours",
+          "severity": "LOW",
+          "explanation": "Only include physical requirements if genuinely essential; ADA requires accommodation consideration",
+          "neutral_alternatives": ["role may require extended periods standing; accommodations available"],
+          "context": "job_description"
+        },
+        {
+          "id": "DB006",
+          "term": "perfect health",
+          "severity": "HIGH",
+          "explanation": "Direct ADA violation; cannot require perfect health",
+          "neutral_alternatives": ["ability to perform essential functions with or without reasonable accommodation"],
+          "context": "job_description"
+        },
+        {
+          "id": "DB007",
+          "term": "drug test required",
+          "severity": "LOW",
+          "explanation": "Legal in most jurisdictions but can discriminate against those with legal prescriptions; ensure policy is clear",
+          "neutral_alternatives": ["pre-employment background screening; accommodations for legal prescriptions"],
+          "context": "job_description"
+        },
+        {
+          "id": "DB008",
+          "term": "crazy",
+          "severity": "HIGH",
+          "explanation": "Ableist language stigmatizing mental health conditions",
+          "neutral_alternatives": ["challenging", "intense", "complex"],
+          "context": "any"
+        },
+        {
+          "id": "DB009",
+          "term": "lame",
+          "severity": "MEDIUM",
+          "explanation": "Ableist slang; originally referred to mobility impairment",
+          "neutral_alternatives": ["weak", "ineffective", "poor quality"],
+          "context": "any"
+        },
+        {
+          "id": "DB010",
+          "term": "dumb",
+          "severity": "MEDIUM",
+          "explanation": "Originally referred to speech impairment; now ableist slang",
+          "neutral_alternatives": ["unclear", "ineffective", "poorly designed"],
+          "context": "any"
+        },
+        {
+          "id": "DB011",
+          "term": "attention to detail required",
+          "severity": "LOW",
+          "explanation": "Can disadvantage ADHD candidates unless genuinely essential; frame as specific task",
+          "neutral_alternatives": ["accuracy in [specific task] is critical"],
+          "context": "job_description"
+        },
+        {
+          "id": "DB012",
+          "term": "mentally tough",
+          "severity": "MEDIUM",
+          "explanation": "Can stigmatize mental health conditions; implies those with conditions are not viable",
+          "neutral_alternatives": ["resilient", "performs under pressure", "emotionally intelligent"],
+          "context": "job_description"
+        },
+        {
+          "id": "DB013",
+          "term": "normal",
+          "severity": "MEDIUM",
+          "explanation": "Implies a standard that excludes neurodiverse or disabled candidates",
+          "neutral_alternatives": ["typical", "standard", "baseline"],
+          "context": "any"
+        }
+      ]
+    },
+    "SOCIOECONOMIC_BIAS": {
+      "description": "Language that disadvantages candidates from lower socioeconomic backgrounds",
+      "patterns": [
+        {
+          "id": "SE001",
+          "term": "unpaid internship required",
+          "severity": "HIGH",
+          "explanation": "Excludes candidates who cannot afford to work without pay; entrenches class inequality",
+          "neutral_alternatives": ["paid internship", "entry-level position with compensation"],
+          "context": "job_description"
+        },
+        {
+          "id": "SE002",
+          "term": "elite university",
+          "severity": "HIGH",
+          "explanation": "Explicit class filter; correlates with race, socioeconomic status, and legacy admissions",
+          "neutral_alternatives": ["accredited four-year institution", "relevant degree or equivalent experience"],
+          "context": "job_description"
+        },
+        {
+          "id": "SE003",
+          "term": "top school",
+          "severity": "HIGH",
+          "explanation": "Same as elite university; excludes qualified candidates from non-ranked institutions",
+          "neutral_alternatives": ["bachelor's degree in [field]"],
+          "context": "job_description"
+        },
+        {
+          "id": "SE004",
+          "term": "must own a car",
+          "severity": "MEDIUM",
+          "explanation": "Excludes urban, lower-income candidates who rely on transit",
+          "neutral_alternatives": ["reliable transportation to [location] required"],
+          "context": "job_description"
+        },
+        {
+          "id": "SE005",
+          "term": "country club",
+          "severity": "MEDIUM",
+          "explanation": "Class-coded benefit or expectation; implies expensive leisure norms",
+          "neutral_alternatives": ["wellness benefits", "team social events"],
+          "context": "any"
+        },
+        {
+          "id": "SE006",
+          "term": "polished",
+          "severity": "MEDIUM",
+          "explanation": "Class-coded presentation standard; disadvantages first-generation professionals",
+          "neutral_alternatives": ["professional", "prepared", "skilled communicator"],
+          "context": "any"
+        },
+        {
+          "id": "SE007",
+          "term": "network",
+          "severity": "LOW",
+          "explanation": "Referral hiring disadvantages candidates without professional networks (often class/race correlated)",
+          "neutral_alternatives": ["open application process; referrals welcome alongside direct applications"],
+          "context": "any"
+        },
+        {
+          "id": "SE008",
+          "term": "golf",
+          "severity": "LOW",
+          "explanation": "Class-coded activity often expected of candidates; excludes lower-income applicants",
+          "neutral_alternatives": ["team-building activities", "relationship-building skills"],
+          "context": "job_description"
+        }
+      ]
+    },
+    "APPEARANCE_BIAS": {
+      "description": "Language that discriminates based on physical appearance",
+      "patterns": [
+        {
+          "id": "AP001",
+          "term": "photo required",
+          "severity": "HIGH",
+          "explanation": "Creates opportunity for appearance, race, age, and gender discrimination",
+          "neutral_alternatives": ["no photo required; evaluated on qualifications only"],
+          "context": "resume"
+        },
+        {
+          "id": "AP002",
+          "term": "professional appearance",
+          "severity": "MEDIUM",
+          "explanation": "Vague standard that often reflects racial or class-coded grooming norms",
+          "neutral_alternatives": ["appropriate dress code: [specific policy]"],
+          "context": "job_description"
+        },
+        {
+          "id": "AP003",
+          "term": "attractive",
+          "severity": "HIGH",
+          "explanation": "Appearance discrimination; illegal in many jurisdictions",
+          "neutral_alternatives": ["remove entirely"],
+          "context": "any"
+        },
+        {
+          "id": "AP004",
+          "term": "well-groomed",
+          "severity": "MEDIUM",
+          "explanation": "Often racially coded (natural hair styles, etc.); ensure policy is specific and equitable",
+          "neutral_alternatives": ["follows our professional dress code [link to policy]"],
+          "context": "any"
+        },
+        {
+          "id": "AP005",
+          "term": "presentable",
+          "severity": "MEDIUM",
+          "explanation": "Vague appearance standard with potential for subjective discrimination",
+          "neutral_alternatives": ["adheres to professional standards as defined in our dress code"],
+          "context": "any"
+        }
+      ]
+    },
+    "COGNITIVE_STYLE_BIAS": {
+      "description": "Language that disadvantages neurodiverse candidates or assumes neurotypical processing styles",
+      "patterns": [
+        {
+          "id": "CS001",
+          "term": "must multitask",
+          "severity": "MEDIUM",
+          "explanation": "Can disadvantage ADHD and neurodiverse candidates; specify actual task requirements",
+          "neutral_alternatives": ["manages multiple priorities effectively", "prioritizes competing demands"],
+          "context": "job_description"
+        },
+        {
+          "id": "CS002",
+          "term": "detail-oriented",
+          "severity": "LOW",
+          "explanation": "Fine if accurate, but should be specific to the role's actual requirements",
+          "neutral_alternatives": ["produces accurate [deliverable type]", "precise in [specific area]"],
+          "context": "job_description"
+        },
+        {
+          "id": "CS003",
+          "term": "social butterfly",
+          "severity": "MEDIUM",
+          "explanation": "Disadvantages introverts and those with social anxiety; specify interaction requirements",
+          "neutral_alternatives": ["skilled at building professional relationships", "effective in team environments"],
+          "context": "job_description"
+        },
+        {
+          "id": "CS004",
+          "term": "think outside the box",
+          "severity": "LOW",
+          "explanation": "Vague; some neurodiverse candidates may interpret idioms literally",
+          "neutral_alternatives": ["creative problem-solving", "generates novel solutions"],
+          "context": "job_description"
+        },
+        {
+          "id": "CS005",
+          "term": "charismatic",
+          "severity": "MEDIUM",
+          "explanation": "Neurotypical social expression standard; disadvantages introverts and autistic candidates",
+          "neutral_alternatives": ["effective communicator", "builds trust with stakeholders"],
+          "context": "job_description"
+        }
+      ]
+    },
+    "INTERVIEW_BIAS": {
+      "description": "Biased questions or patterns observed in interview transcripts",
+      "eeoc_reference": "EEOC prohibited pre-employment inquiries",
+      "patterns": [
+        {
+          "id": "IB001",
+          "term": "do you have children",
+          "severity": "HIGH",
+          "explanation": "Illegal pre-employment inquiry in all US states; implies commitment concern for women",
+          "neutral_alternatives": ["Are you able to meet the travel/schedule requirements of this role?"],
+          "context": "interview"
+        },
+        {
+          "id": "IB002",
+          "term": "are you married",
+          "severity": "HIGH",
+          "explanation": "EEOC prohibited inquiry; implies stability bias against single candidates or concern for women",
+          "neutral_alternatives": ["remove entirely"],
+          "context": "interview"
+        },
+        {
+          "id": "IB003",
+          "term": "what country are you from",
+          "severity": "HIGH",
+          "explanation": "National origin discrimination; prohibited inquiry",
+          "neutral_alternatives": ["Are you authorized to work in [country]?"],
+          "context": "interview"
+        },
+        {
+          "id": "IB004",
+          "term": "how old are you",
+          "severity": "HIGH",
+          "explanation": "Direct ADEA violation in hiring context",
+          "neutral_alternatives": ["remove entirely"],
+          "context": "interview"
+        },
+        {
+          "id": "IB005",
+          "term": "do you go to church",
+          "severity": "HIGH",
+          "explanation": "Religious discrimination; Title VII protected characteristic",
+          "neutral_alternatives": ["remove entirely"],
+          "context": "interview"
+        },
+        {
+          "id": "IB006",
+          "term": "what does your spouse do",
+          "severity": "HIGH",
+          "explanation": "Marital status probe; implies financial dependency assumptions",
+          "neutral_alternatives": ["remove entirely"],
+          "context": "interview"
+        },
+        {
+          "id": "IB007",
+          "term": "do you have any disabilities",
+          "severity": "HIGH",
+          "explanation": "ADA prohibited pre-offer inquiry",
+          "neutral_alternatives": ["Can you perform the essential functions of this role with or without reasonable accommodation?"],
+          "context": "interview"
+        },
+        {
+          "id": "IB008",
+          "term": "what medications do you take",
+          "severity": "HIGH",
+          "explanation": "Medical inquiry; ADA violation pre-offer",
+          "neutral_alternatives": ["remove entirely"],
+          "context": "interview"
+        },
+        {
+          "id": "IB009",
+          "term": "are you a US citizen",
+          "severity": "MEDIUM",
+          "explanation": "Citizenship status can be a proxy for national origin discrimination; ask about work authorization instead",
+          "neutral_alternatives": ["Are you authorized to work in the United States?"],
+          "context": "interview"
+        },
+        {
+          "id": "IB010",
+          "term": "tell me about your family",
+          "severity": "HIGH",
+          "explanation": "Opens door to prohibited inquiries about marital status, children, religion",
+          "neutral_alternatives": ["Tell me about a time you balanced competing priorities at work"],
+          "context": "interview"
+        },
+        {
+          "id": "IB011",
+          "term": "salary history",
+          "severity": "HIGH",
+          "explanation": "Prohibited in 21 US states; perpetuates gender pay gap",
+          "neutral_alternatives": ["What are your compensation expectations for this role?"],
+          "context": "interview"
+        },
+        {
+          "id": "IB012",
+          "term": "where did you grow up",
+          "severity": "MEDIUM",
+          "explanation": "Can reveal national origin, socioeconomic status, or race",
+          "neutral_alternatives": ["remove unless directly relevant; ask about professional background instead"],
+          "context": "interview"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "total_patterns": 213,
+    "last_updated": "2024-01-15",
+    "sources": [
+      "Gaucher, D., Friesen, J., & Kay, A.C. (2011). Evidence that gendered wording in job advertisements exists and sustains gender inequality.",
+      "Rivera, L.A. (2012). Hiring as cultural matching: The case of elite professional service firms.",
+      "Leslie, S.J., Cimpian, A., Meyer, M., & Freeland, E. (2015). Expectations of brilliance underlie gender distributions across academic disciplines.",
+      "Bertrand, M., & Mullainathan, S. (2004). Are Emily and Greg more employable than Lakisha and Jamal?",
+      "EEOC Pre-Employment Inquiry Guide (2024)",
+      "ADA Title I Employment Regulations",
+      "ADEA Guidelines"
+    ]
+  }
+}

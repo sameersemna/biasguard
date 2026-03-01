@@ -1,0 +1,109 @@
+version: "3.9"
+
+# ============================================================
+# BiasGuard — Docker Compose
+# Local development stack: API + Frontend + Monitoring
+# ============================================================
+
+services:
+
+  # ── BiasGuard API ─────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: biasguard-api
+    ports:
+      - "8000:8000"
+    environment:
+      - LLM_PROVIDER=${LLM_PROVIDER:-anthropic}
+      - LLM_MODEL=${LLM_MODEL:-claude-3-5-sonnet-20241022}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - VECTOR_DB=chroma
+      - CHROMA_PERSIST_DIR=/data/chroma_db
+      - PHOENIX_ENABLED=${PHOENIX_ENABLED:-true}
+      - PHOENIX_COLLECTOR_ENDPOINT=http://phoenix:6006
+      - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2:-false}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+      - LOG_LEVEL=INFO
+      - API_DEBUG=false
+    volumes:
+      - chroma_data:/data/chroma_db
+      - ./logs:/app/logs
+    depends_on:
+      phoenix:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+
+  # ── Streamlit Frontend ────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: biasguard-frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - STREAMLIT_API_BASE_URL=http://api:8000
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # ── Arize Phoenix (LLM Observability) ────────────────────
+  phoenix:
+    image: arizephoenix/phoenix:latest
+    container_name: biasguard-phoenix
+    ports:
+      - "6006:6006"
+      - "4317:4317"   # OTLP gRPC
+    volumes:
+      - phoenix_data:/root/.phoenix
+    restart: unless-stopped
+
+  # ── Prometheus ────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: biasguard-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=15d'
+    restart: unless-stopped
+
+  # ── Grafana ───────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    container_name: biasguard-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=biasguard
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  chroma_data:
+  phoenix_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  default:
+    name: biasguard-network
