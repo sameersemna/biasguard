@@ -1,4 +1,5 @@
 # BiasGuard 🛡️ — Bias-Detection RAG Agent for Hiring
+## by Unbiased Talent
 
 <div align="center">
 

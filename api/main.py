@@ -17,9 +17,10 @@ import time
 from contextlib import asynccontextmanager
 
 import structlog
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
 from api.models import (
     AnalyzeRequest,
@@ -31,10 +32,12 @@ from api.models import (
 from bias_db.bias_db import get_bias_db
 from config.settings import get_settings
 from monitoring.prometheus_metrics import (
+    ACTIVE_ANALYSES,
     ANALYSIS_DURATION,
     BIAS_SCORE_HISTOGRAM,
-    REQUESTS_TOTAL,
     HIGH_SEVERITY_ALERTS,
+    KB_DOCUMENT_COUNT,
+    REQUESTS_TOTAL,
 )
 
 logger = structlog.get_logger(__name__)
@@ -138,6 +141,7 @@ async def health_check():
         stats = db.get_collection_stats()
         db_connected = True
         doc_count = stats.get("document_count", 0)
+        KB_DOCUMENT_COUNT.set(doc_count)
     except Exception:
         db_connected = False
         doc_count = None
@@ -149,6 +153,12 @@ async def health_check():
         llm_provider=settings.llm_provider.value,
         document_count=doc_count,
     )
+
+
+@app.get("/metrics", tags=["System"])
+async def metrics() -> Response:
+    """Prometheus metrics endpoint."""
+    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
 @app.get("/kb/stats", response_model=KBStatsResponse, tags=["Knowledge Base"])
@@ -198,6 +208,7 @@ async def analyze_document(request: AnalyzeRequest):
     )
 
     t0 = time.time()
+    ACTIVE_ANALYSES.inc()
 
     try:
         orchestrator = get_orchestrator()
@@ -232,6 +243,8 @@ async def analyze_document(request: AnalyzeRequest):
             success=False,
             error=f"Analysis failed: {str(e)}",
         )
+    finally:
+        ACTIVE_ANALYSES.dec()
 
 
 @app.get("/examples", tags=["Examples"])

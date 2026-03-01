@@ -471,7 +471,7 @@ def main():
 
         llm_provider = st.selectbox(
             "LLM Provider",
-            ["anthropic", "openai", "groq", "xai"],
+            ["openai", "anthropic", "groq", "xai"],
             help="Select your LLM provider",
         )
 

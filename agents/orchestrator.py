@@ -29,6 +29,7 @@ from agents.scorer_agent import ScorerAgent
 from api.models import BiasGuardReport, DocumentType
 from config.llm_router import build_llm
 from config.settings import get_settings
+from monitoring.prometheus_metrics import LLM_CALLS_TOTAL, LLM_LATENCY
 
 logger = structlog.get_logger(__name__)
 
@@ -169,6 +170,9 @@ class BiasGuardOrchestrator:
         logger.info("node_analyze_start", run_id=state["run_id"])
         t0 = time.time()
 
+        provider = state.get("llm_provider") or self.settings.llm_provider.value
+        model = self.settings.llm_model
+
         try:
             llm = build_llm(
                 provider=state.get("llm_provider"),
@@ -195,6 +199,17 @@ class BiasGuardOrchestrator:
         except Exception as e:
             logger.error("node_analyze_failed", error=str(e))
             return {"error": f"Analysis failed: {e}"}
+        finally:
+            elapsed_seconds = max((time.time() - t0), 0.0)
+            LLM_CALLS_TOTAL.labels(
+                provider=str(provider),
+                model=str(model),
+                agent="analyzer",
+            ).inc()
+            LLM_LATENCY.labels(
+                provider=str(provider),
+                agent="analyzer",
+            ).observe(elapsed_seconds)
 
     def _mitigate_node(self, state: BiasGuardState) -> dict:
         """Mitigator Agent: generate neutral rewrites for each bias instance."""
@@ -203,6 +218,9 @@ class BiasGuardOrchestrator:
 
         logger.info("node_mitigate_start", run_id=state["run_id"])
         t0 = time.time()
+
+        provider = self.settings.llm_provider.value
+        model = self.settings.llm_model
 
         try:
             llm = build_llm(settings=self.settings)
@@ -225,6 +243,17 @@ class BiasGuardOrchestrator:
         except Exception as e:
             logger.error("node_mitigate_failed", error=str(e))
             return {"rewrites": [], "error": f"Mitigation failed: {e}"}
+        finally:
+            elapsed_seconds = max((time.time() - t0), 0.0)
+            LLM_CALLS_TOTAL.labels(
+                provider=str(provider),
+                model=str(model),
+                agent="mitigator",
+            ).inc()
+            LLM_LATENCY.labels(
+                provider=str(provider),
+                agent="mitigator",
+            ).observe(elapsed_seconds)
 
     def _score_node(self, state: BiasGuardState) -> dict:
         """Scorer Agent: calculate overall bias score and severity."""

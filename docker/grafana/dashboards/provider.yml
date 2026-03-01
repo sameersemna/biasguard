@@ -1,0 +1,12 @@
+apiVersion: 1
+
+providers:
+  - name: BiasGuard Dashboards
+    orgId: 1
+    folder: BiasGuard
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards

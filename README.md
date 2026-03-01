@@ -1,6 +1,8 @@
 # BiasGuard 🛡️ — Bias-Detection RAG Agent for Hiring
 ## by Unbiased Talent
 
+<div align="center">
+
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?logo=fastapi)](https://fastapi.tiangolo.com)
 [![LangChain](https://img.shields.io/badge/LangChain-0.2-6B4FBB)](https://langchain.com)
