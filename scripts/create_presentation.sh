@@ -1,12 +1,12 @@
 #!/bin/bash
 
-rm -rf presentations/*.py presentations/requirements.txt presentations/README.md
+rm -rf presentation/*.py presentation/requirements.txt presentation/README.md
 
 echo "Creating presentation directory and copying relevant files..."
-cp agents/orchestrator.py presentations/orchestrator.py
-cp frontend/streamlit_app.py presentations/streamlit_app.py
-cp ./requirements.txt presentations/requirements.txt
-cp ./README.md presentations/README.md
+# cp agents/orchestrator.py presentation/orchestrator.py
+# cp frontend/streamlit_app.py presentation/streamlit_app.py
+# cp ./requirements.txt presentation/requirements.txt
+# cp ./README.md presentation/README.md
 echo "Presentation files created in the 'presentations' directory."
 
 # To run the presentation, navigate to the 'presentations' directory and execute:
