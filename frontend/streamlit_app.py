@@ -384,8 +384,8 @@ def render_bias_instance(instance: dict, idx: int) -> None:
 
 def generate_markdown_report(report: dict) -> str:
     """Generate a Markdown report from the analysis results."""
-    severity = report.get("severity", "UNKNOWN")
-    score = report.get("overall_bias_score", 0.0)
+    severity = report.get("severity") or "UNKNOWN"
+    score = report.get("overall_bias_score") or 0.0
     instances = report.get("bias_instances", [])
 
     lines = [
@@ -401,7 +401,7 @@ def generate_markdown_report(report: dict) -> str:
         "",
         "## Summary",
         "",
-        report.get("document_summary", ""),
+        report.get("document_summary") or "",
         "",
     ]
 
@@ -441,7 +441,7 @@ def generate_markdown_report(report: dict) -> str:
         "*This report should be reviewed by qualified HR professionals.*",
     ]
 
-    return "\n".join(lines)
+    return "\n".join("" if line is None else str(line) for line in lines)
 
 
 # ─── Main App ──────────────────────────────────────────────────────────────
@@ -509,7 +509,7 @@ def main():
         - 🚨 Interview Bias (prohibited questions)
         
         Powered by **LangGraph + ChromaDB + RAG**.  
-        [GitHub](https://github.com/sameersemna/biasguard) · [Docs](https://biasguard.ai/docs)
+        [GitHub](https://github.com/sameersemna/biasguard) · [Report Bug](https://github.com/sameersemna/biasguard/issues)
         """)
 
     # ── Main Content ───────────────────────────────────────────────────────
