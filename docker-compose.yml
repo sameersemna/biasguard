@@ -57,6 +57,7 @@ services:
       - STREAMLIT_SERVER_FILE_WATCHER_TYPE=poll
     volumes:
       - ./frontend:/app/frontend
+      - ./frontend/.streamlit:/app/.streamlit
     depends_on:
       - api
     restart: unless-stopped

@@ -6,9 +6,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir streamlit plotly pandas httpx
+COPY frontend/requirements.txt ./frontend/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY frontend/ ./frontend/
+COPY frontend/.streamlit/ ./.streamlit/
 
 EXPOSE 8501
 

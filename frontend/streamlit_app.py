@@ -18,6 +18,7 @@ from __future__ import annotations
 import json
 import os
 import time
+from io import BytesIO
 
 import httpx
 import pandas as pd
@@ -36,7 +37,11 @@ st.set_page_config(
 
 def _resolve_api_base() -> str:
     """Resolve API base URL from Streamlit secrets or environment."""
-    api_from_secrets = st.secrets.get("STREAMLIT_API_BASE_URL")
+    api_from_secrets = None
+    try:
+        api_from_secrets = st.secrets.get("STREAMLIT_API_BASE_URL")
+    except FileNotFoundError:
+        api_from_secrets = None
     api_from_env = os.getenv("STREAMLIT_API_BASE_URL")
     api_base = api_from_secrets or api_from_env or "http://localhost:8000"
     return api_base.rstrip("/")
@@ -444,6 +449,39 @@ def generate_markdown_report(report: dict) -> str:
     return "\n".join("" if line is None else str(line) for line in lines)
 
 
+def extract_text_from_uploaded_file(uploaded_file) -> str | None:
+    """Extract text from uploaded TXT, PDF, or DOCX files."""
+    file_name = (uploaded_file.name or "").lower()
+    file_bytes = uploaded_file.getvalue()
+
+    try:
+        if file_name.endswith(".txt") or uploaded_file.type == "text/plain":
+            return file_bytes.decode("utf-8", errors="ignore").strip()
+
+        if file_name.endswith(".pdf"):
+            from pypdf import PdfReader
+
+            reader = PdfReader(BytesIO(file_bytes))
+            text = "\n".join((page.extract_text() or "") for page in reader.pages)
+            return text.strip()
+
+        if file_name.endswith(".docx"):
+            from docx import Document
+
+            document = Document(BytesIO(file_bytes))
+            text = "\n".join(paragraph.text for paragraph in document.paragraphs)
+            return text.strip()
+
+        st.error("Unsupported file type. Please upload TXT, PDF, or DOCX.")
+        return None
+    except ImportError:
+        st.error("Missing parser dependency for this file type. Please reinstall frontend dependencies.")
+        return None
+    except Exception as error:
+        st.error(f"Could not extract text from uploaded file: {error}")
+        return None
+
+
 # ─── Main App ──────────────────────────────────────────────────────────────
 
 def main():
@@ -539,11 +577,16 @@ def main():
             uploaded_file = st.file_uploader(
                 "Or upload a file",
                 type=["txt", "pdf", "docx"],
-                help="PDF and DOCX extraction requires additional dependencies",
+                help="Upload TXT, PDF, or DOCX resume/document",
             )
 
-            if uploaded_file and uploaded_file.type == "text/plain":
-                input_text = uploaded_file.read().decode("utf-8")
+            if uploaded_file:
+                extracted_text = extract_text_from_uploaded_file(uploaded_file)
+                if extracted_text:
+                    input_text = extracted_text
+                    st.session_state["input_text"] = extracted_text
+                else:
+                    st.warning("No text could be extracted from the uploaded file.")
 
             word_count = len(input_text.split()) if input_text else 0
             st.caption(f"📝 {word_count:,} words")
