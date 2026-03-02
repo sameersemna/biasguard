@@ -1,5 +1,5 @@
 # BiasGuard 🛡️ — Bias-Detection RAG Agent for Hiring
-## by Unbiased Talent
+## by [Unbiased Talent](URL "https://unbiasedtalent.com/")
 
 <div align="center">
 
@@ -14,6 +14,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/sameersemna/biasguard/actions/workflows/ci.yml/badge.svg)](https://github.com/sameersemna/biasguard/actions)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+
+![BiasGuard](presentation/biasguard.png)
 
 **Production-grade, agentic RAG system that detects and mitigates hiring bias in resumes, job descriptions, and interview transcripts.**
 
@@ -39,6 +41,8 @@ This project is built to the standard expected of a Principal MLOps/GenAI engine
 ---
 
 ## Architecture
+
+![Architecture](presentation/architecture.png)
 
 ```mermaid
 graph TB
