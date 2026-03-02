@@ -6,19 +6,18 @@ Pydantic v2 models for all request and response types.
 
 from __future__ import annotations
 
-from enum import Enum
-from typing import Any
+from enum import StrEnum
 
 from pydantic import BaseModel, Field, field_validator
 
 
-class DocumentType(str, Enum):
+class DocumentType(StrEnum):
     JOB_DESCRIPTION = "job_description"
     RESUME = "resume"
     INTERVIEW_TRANSCRIPT = "interview_transcript"
 
 
-class SeverityLevel(str, Enum):
+class SeverityLevel(StrEnum):
     NONE = "NONE"
     LOW = "LOW"
     MEDIUM = "MEDIUM"
@@ -26,7 +25,7 @@ class SeverityLevel(str, Enum):
     CRITICAL = "CRITICAL"
 
 
-class BiasCategory(str, Enum):
+class BiasCategory(StrEnum):
     GENDER = "GENDER_BIAS"
     AGE = "AGE_BIAS"
     RACIAL = "RACIAL_ETHNIC_BIAS"

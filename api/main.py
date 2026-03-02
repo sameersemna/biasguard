@@ -17,7 +17,7 @@ import time
 from contextlib import asynccontextmanager
 
 import structlog
-from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
+from fastapi import FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
@@ -228,7 +228,7 @@ async def analyze_document(request: AnalyzeRequest):
         ).observe(score)
 
         ANALYSIS_DURATION.labels(doc_type=request.doc_type.value).observe(
-            (time.time() - t0)
+            time.time() - t0
         )
 
         if severity in ("HIGH", "CRITICAL"):

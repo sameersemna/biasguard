@@ -15,7 +15,6 @@ logger = structlog.get_logger(__name__)
 def setup_phoenix(settings=None) -> None:
     """Initialize Arize Phoenix tracing."""
     try:
-        import phoenix as px
         from openinference.instrumentation.langchain import LangChainInstrumentor
         from phoenix.otel import register
 

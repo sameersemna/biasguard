@@ -18,12 +18,9 @@ from __future__ import annotations
 import json
 import os
 import time
-from io import StringIO
-from pathlib import Path
 
 import httpx
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
@@ -545,9 +542,8 @@ def main():
                 help="PDF and DOCX extraction requires additional dependencies",
             )
 
-            if uploaded_file:
-                if uploaded_file.type == "text/plain":
-                    input_text = uploaded_file.read().decode("utf-8")
+            if uploaded_file and uploaded_file.type == "text/plain":
+                input_text = uploaded_file.read().decode("utf-8")
 
             word_count = len(input_text.split()) if input_text else 0
             st.caption(f"📝 {word_count:,} words")

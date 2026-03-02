@@ -7,7 +7,6 @@ Implements automatic fallback with retry logic.
 
 import structlog
 from langchain_core.language_models import BaseChatModel
-from tenacity import retry, stop_after_attempt, wait_exponential
 
 from config.settings import LLMProvider, Settings, get_settings
 

@@ -20,7 +20,7 @@
 
 **Production-grade, agentic RAG system that detects and mitigates hiring bias in resumes, job descriptions, and interview transcripts.**
 
-[Live Demo](#) · [Documentation](docs/) · [Report Bug](issues/) · [Request Feature](issues/)
+[Live Demo](https://unbiasguard.streamlit.app/) · [Report Bug](https://github.com/sameersemna/biasguard/issues)
 
 </div>
 

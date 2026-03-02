@@ -5,7 +5,7 @@ All settings are environment-driven via .env.
 Uses Pydantic Settings for type-safe config with validation.
 """
 
-from enum import Enum
+from enum import StrEnum
 from functools import lru_cache
 from pathlib import Path
 
@@ -13,25 +13,25 @@ from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class LLMProvider(str, Enum):
+class LLMProvider(StrEnum):
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
     GROQ = "groq"
     XAI = "xai"
 
 
-class VectorDB(str, Enum):
+class VectorDB(StrEnum):
     CHROMA = "chroma"
     PINECONE = "pinecone"
 
 
-class EmbeddingProvider(str, Enum):
+class EmbeddingProvider(StrEnum):
     OPENAI = "openai"
     NOMIC = "nomic"
     HUGGINGFACE = "huggingface"
 
 
-class LogLevel(str, Enum):
+class LogLevel(StrEnum):
     DEBUG = "DEBUG"
     INFO = "INFO"
     WARNING = "WARNING"

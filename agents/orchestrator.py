@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import time
 import uuid
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any
 
 import structlog
 from langchain_core.messages import BaseMessage
@@ -26,7 +26,6 @@ from agents.analyzer_agent import AnalyzerAgent
 from agents.mitigator_agent import MitigatorAgent
 from agents.retriever_agent import RetrieverAgent
 from agents.scorer_agent import ScorerAgent
-from api.models import BiasGuardReport, DocumentType
 from config.llm_router import build_llm
 from config.settings import get_settings
 from monitoring.prometheus_metrics import LLM_CALLS_TOTAL, LLM_LATENCY
