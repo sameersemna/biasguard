@@ -14,8 +14,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+COPY requirements-backend.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements-backend.txt
 
 # ── Final Stage ───────────────────────────────────────────────
 FROM python:3.11-slim AS runtime

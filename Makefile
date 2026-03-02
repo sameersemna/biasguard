@@ -30,7 +30,7 @@ help:
 	@echo "    make analyze-demo   Run CLI analysis on sample JD"
 
 install:
-	pip install -r requirements.txt
+	pip install -r requirements-backend.txt
 
 dev-install:
 	pip install -r requirements-dev.txt

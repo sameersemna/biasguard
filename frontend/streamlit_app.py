@@ -36,7 +36,16 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-API_BASE = os.getenv("STREAMLIT_API_BASE_URL", "http://localhost:8000")
+
+def _resolve_api_base() -> str:
+    """Resolve API base URL from Streamlit secrets or environment."""
+    api_from_secrets = st.secrets.get("STREAMLIT_API_BASE_URL")
+    api_from_env = os.getenv("STREAMLIT_API_BASE_URL")
+    api_base = api_from_secrets or api_from_env or "http://localhost:8000"
+    return api_base.rstrip("/")
+
+
+API_BASE = _resolve_api_base()
 
 SAMPLE_INPUTS = {
     "Biased Job Description": {

@@ -13,6 +13,7 @@
 [![LangSmith](https://img.shields.io/badge/LangSmith-traced-6B4FBB)](https://smith.langchain.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/sameersemna/biasguard/actions/workflows/ci.yml/badge.svg)](https://github.com/sameersemna/biasguard/actions)
+[![Streamlit Sanity](https://github.com/sameersemna/biasguard/actions/workflows/streamlit-sanity.yml/badge.svg)](https://github.com/sameersemna/biasguard/actions/workflows/streamlit-sanity.yml)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
 ![BiasGuard](presentation/biasguard.png)
@@ -151,7 +152,7 @@ sequenceDiagram
 | **Tracing** | LangSmith + Arize Phoenix | LLM observability |
 | **Metrics** | Prometheus + Grafana | Ops monitoring |
 | **Testing** | Pytest + pytest-asyncio | Unit + integration tests |
-| **CI/CD** | GitHub Actions | Automated test + lint |
+| **CI/CD** | GitHub Actions | Automated test + lint + Streamlit build sanity |
 | **Containers** | Docker + Docker Compose | Local + cloud deploy |
 | **Embeddings** | `text-embedding-3-small` / `nomic-embed-text` | Bias KB embeddings |
 | **Reports** | Markdown + WeasyPrint PDF | Shareable output |
@@ -231,7 +232,8 @@ biasguard/
 │       └── docker-publish.yml
 ├── docker-compose.yml
 ├── docker-compose.prod.yml
-├── requirements.txt
+├── requirements.txt            # Frontend deps (Streamlit Cloud)
+├── requirements-backend.txt    # API/backend deps
 ├── requirements-dev.txt
 ├── .env.example
 ├── pyproject.toml
@@ -272,9 +274,9 @@ docker compose up --build
 ### 3. Run Locally
 
 ```bash
-# Install dependencies
+# Install backend dependencies
 python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-backend.txt
 
 # Ingest the bias knowledge base
 bash scripts/ingest_kb.sh
@@ -312,6 +314,11 @@ python scripts/generate_report.py \
 3. In Streamlit Community Cloud, create a new app with:
    - **Repository:** this repo
    - **Main file path:** `frontend/streamlit_app.py`
+  - **Python version:** `3.11` (via `runtime.txt` in repo root)
+
+> Streamlit Cloud installs dependencies from root `requirements.txt` automatically.
+> This repo keeps root `requirements.txt` frontend-only for cloud compatibility.
+> Backend/API dependencies are in `requirements-backend.txt`.
 4. In app **Settings → Secrets**, add:
 
 ```toml
@@ -321,6 +328,9 @@ STREAMLIT_API_BASE_URL="https://api_biasguard.unbiasedtalent.com"
 5. Save secrets and redeploy. The sidebar should show the configured API base URL.
 
 If the API is unreachable, the UI automatically falls back to demo/mock mode.
+
+> CI Guardrail: the `Streamlit Build Sanity` workflow installs root `requirements.txt`
+> (same behavior as Streamlit Cloud) and runs a frontend compile/import smoke check.
 
 ---
 
