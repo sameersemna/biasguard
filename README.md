@@ -305,6 +305,23 @@ python scripts/generate_report.py \
   --output-format pdf
 ```
 
+### 5. Deploy Frontend to Streamlit Community Cloud
+
+1. Push your latest code to GitHub.
+2. Deploy the API separately (Render/Railway/Fly.io/Cloud Run, etc.) and copy its public base URL.
+3. In Streamlit Community Cloud, create a new app with:
+   - **Repository:** this repo
+   - **Main file path:** `frontend/streamlit_app.py`
+4. In app **Settings → Secrets**, add:
+
+```toml
+STREAMLIT_API_BASE_URL="https://api_biasguard.unbiasedtalent.com"
+```
+
+5. Save secrets and redeploy. The sidebar should show the configured API base URL.
+
+If the API is unreachable, the UI automatically falls back to demo/mock mode.
+
 ---
 
 ## Bias Categories Detected

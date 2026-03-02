@@ -460,7 +460,8 @@ def main():
     else:
         st.warning(
             "⚠️ API Offline — Using mock mode. "
-            "Start the API with: `uvicorn api.main:app --reload`",
+            "For Streamlit Cloud, set `STREAMLIT_API_BASE_URL` in app Secrets. "
+            "For local dev, start API with: `uvicorn api.main:app --reload`",
             icon="⚠️",
         )
 
@@ -468,6 +469,7 @@ def main():
 
     with st.sidebar:
         st.markdown("## ⚙️ Configuration")
+        st.caption(f"API Base: {API_BASE}")
 
         llm_provider = st.selectbox(
             "LLM Provider",
