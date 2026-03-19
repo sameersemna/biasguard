@@ -15,6 +15,7 @@ Features:
 
 from __future__ import annotations
 
+import html
 import json
 import os
 import time
@@ -449,6 +450,102 @@ def generate_markdown_report(report: dict) -> str:
     return "\n".join("" if line is None else str(line) for line in lines)
 
 
+def build_rewritten_from_instances(original: str, instances: list[dict]) -> str:
+    """Build a best-effort rewritten document from per-instance rewrites."""
+    rewritten = original or ""
+    for inst in instances:
+        span = (inst.get("span") or "").strip()
+        replacement = (inst.get("rewrite_suggestion") or "").strip()
+        if not span or not replacement:
+            continue
+        if span in rewritten:
+            rewritten = rewritten.replace(span, replacement, 1)
+    return rewritten
+
+
+def extract_change_pairs(instances: list[dict]) -> list[dict]:
+    """Extract before/after rewrite pairs from bias instances."""
+    pairs = []
+    for inst in instances:
+        before = (inst.get("span") or "").strip()
+        after = (inst.get("rewrite_suggestion") or "").strip()
+        if not before or not after:
+            continue
+        pairs.append(
+            {
+                "Severity": inst.get("severity", ""),
+                "Category": (inst.get("category", "") or "").replace("_", " "),
+                "Before": before,
+                "After": after,
+                "Why Changed": inst.get("rewrite_explanation", ""),
+            }
+        )
+    return pairs
+
+
+def _collect_term_highlights(text: str, terms_with_colors: list[tuple[str, str]]) -> list[tuple[int, int, str]]:
+    """Find non-overlapping ranges for terms and attach their display colors."""
+    highlights: list[tuple[int, int, str]] = []
+
+    def overlaps(start: int, end: int) -> bool:
+        return any(not (end <= hs or start >= he) for hs, he, _ in highlights)
+
+    for term, color in terms_with_colors:
+        if not term:
+            continue
+
+        search_start = 0
+        while True:
+            idx = text.find(term, search_start)
+            if idx < 0:
+                break
+
+            end = idx + len(term)
+            if not overlaps(idx, end):
+                highlights.append((idx, end, color))
+                break
+
+            search_start = idx + 1
+
+    highlights.sort(key=lambda x: x[0])
+    return highlights
+
+
+def render_highlighted_document(text: str, terms_with_colors: list[tuple[str, str]]) -> str:
+    """Render text as HTML with color-coded highlights for matched terms."""
+    highlights = _collect_term_highlights(text, terms_with_colors)
+    if not highlights:
+        return (
+            "<div style='padding:16px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); "
+            "min-height:320px; white-space:pre-wrap;'>"
+            f"{html.escape(text)}"
+            "</div>"
+        )
+
+    pieces: list[str] = []
+    cursor = 0
+    for start, end, color in highlights:
+        if start > cursor:
+            pieces.append(html.escape(text[cursor:start]))
+
+        segment = html.escape(text[start:end])
+        pieces.append(
+            f"<span style='background:{color}; padding:1px 3px; border-radius:3px; "
+            f"box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15);'>{segment}</span>"
+        )
+        cursor = end
+
+    if cursor < len(text):
+        pieces.append(html.escape(text[cursor:]))
+
+    return (
+        "<div style='padding:16px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); "
+        "min-height:320px; white-space:pre-wrap;'>"
+        + "".join(pieces)
+        + "</div>"
+    )
+
+
 def extract_text_from_uploaded_file(uploaded_file) -> str | None:
     """Extract text from uploaded TXT, PDF, or DOCX files."""
     file_name = (uploaded_file.name or "").lower()
@@ -647,56 +744,94 @@ def main():
 
             report = st.session_state["last_report"]
             original = st.session_state["last_input"] or ""
+            instances = report.get("bias_instances", [])
+            changes = extract_change_pairs(instances)
             rewritten = (
                 report.get("full_document_rewrite")
                 or report.get("debiased_document")
                 or report.get("rewritten_text")
-                or original
+            )
+
+            # Fall back to deterministic in-UI reconstruction if the backend
+            # did not return a useful full rewrite.
+            if not rewritten or str(rewritten).strip() == str(original).strip():
+                rewritten = build_rewritten_from_instances(original, instances)
+
+            if not rewritten:
+                rewritten = original
+
+            color_palette = [
+                "rgba(241, 196, 15, 0.45)",
+                "rgba(46, 204, 113, 0.35)",
+                "rgba(52, 152, 219, 0.35)",
+                "rgba(230, 126, 34, 0.35)",
+                "rgba(26, 188, 156, 0.35)",
+                "rgba(155, 89, 182, 0.35)",
+                "rgba(231, 76, 60, 0.30)",
+                "rgba(241, 90, 36, 0.30)",
+            ]
+            for i, change in enumerate(changes):
+                change["_color"] = color_palette[i % len(color_palette)]
+
+            original_html = render_highlighted_document(
+                str(original),
+                [(c.get("Before", ""), c.get("_color", "rgba(241, 196, 15, 0.45)")) for c in changes],
+            )
+            rewritten_html = render_highlighted_document(
+                str(rewritten),
+                [(c.get("After", ""), c.get("_color", "rgba(241, 196, 15, 0.45)")) for c in changes],
             )
 
             col_before, col_after = st.columns(2)
             with col_before:
                 st.markdown("#### ❌ Original (with bias)")
-                st.text_area(
-                    "Original document",
-                    value=str(original),
-                    height=320,
-                    key="compare_original",
-                    disabled=True,
-                    label_visibility="collapsed",
-                )
+                st.markdown(original_html, unsafe_allow_html=True)
 
             with col_after:
                 st.markdown("#### ✅ Debiased Version")
-                st.text_area(
-                    "Debiased document",
-                    value=str(rewritten),
-                    height=320,
-                    key="compare_rewritten",
-                    disabled=True,
-                    label_visibility="collapsed",
-                )
+                st.markdown(rewritten_html, unsafe_allow_html=True)
 
             st.markdown("---")
-            instances = report.get("bias_instances", [])
-            changes = [
-                {
-                    "Severity": inst.get("severity", ""),
-                    "Category": inst.get("category", "").replace("_", " "),
-                    "Before": inst.get("span", ""),
-                    "After": inst.get("rewrite_suggestion", ""),
-                    "Why Changed": inst.get("rewrite_explanation", ""),
-                }
-                for inst in instances
-                if (inst.get("span") and inst.get("rewrite_suggestion"))
-            ]
-
             st.markdown(f"**Bias instances eliminated:** {report.get('bias_instance_count', 0)}")
             st.markdown("#### 🧾 Detailed Changes")
 
             if changes:
+                legend_items = []
+                for idx, c in enumerate(changes, start=1):
+                    before_text = html.escape(c.get("Before", "")[:40])
+                    after_text = html.escape(c.get("After", "")[:40])
+                    if len(c.get("Before", "")) > 40:
+                        before_text += "..."
+                    if len(c.get("After", "")) > 40:
+                        after_text += "..."
+
+                    legend_items.append(
+                        "<div style='display:inline-flex; align-items:center; gap:8px; margin:4px 8px 4px 0; "
+                        "padding:4px 8px; border:1px solid rgba(255,255,255,0.15); border-radius:999px;'>"
+                        f"<span style='display:inline-block; width:12px; height:12px; border-radius:3px; background:{c.get('_color')};'></span>"
+                        f"<span style='font-size:0.82rem;'>#{idx}: {before_text} -> {after_text}</span>"
+                        "</div>"
+                    )
+
+                st.markdown(
+                    "<div style='margin:6px 0 12px 0;'>"
+                    + "".join(legend_items)
+                    + "</div>",
+                    unsafe_allow_html=True,
+                )
+
+                display_rows = [
+                    {
+                        "Severity": c["Severity"],
+                        "Category": c["Category"],
+                        "Before": c["Before"],
+                        "After": c["After"],
+                        "Why Changed": c["Why Changed"],
+                    }
+                    for c in changes
+                ]
                 st.dataframe(
-                    pd.DataFrame(changes),
+                    pd.DataFrame(display_rows),
                     use_container_width=True,
                     hide_index=True,
                 )
