@@ -137,6 +137,11 @@ class ScorerAgent:
         if has_critical and score > 0.5:
             return "CRITICAL"
 
+        # A HIGH-severity finding in a high-risk legal category should never
+        # be down-classified to LOW/MEDIUM by normalization alone.
+        if has_critical:
+            return "HIGH"
+
         if score >= 0.70:
             return "HIGH"
         elif score >= 0.40:

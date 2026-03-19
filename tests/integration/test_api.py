@@ -79,7 +79,7 @@ class TestAnalyzeEndpoint:
         assert response.status_code == 422
 
     def test_analyze_valid_request(self, client, mock_orchestrator_result):
-        with patch("api.main.get_orchestrator") as mock_orch:
+        with patch("agents.orchestrator.get_orchestrator") as mock_orch:
             mock_orch.return_value.run.return_value = mock_orchestrator_result
 
             response = client.post(
@@ -103,7 +103,7 @@ class TestAnalyzeEndpoint:
         assert response.status_code == 422
 
     def test_analyze_response_has_required_fields(self, client, mock_orchestrator_result):
-        with patch("api.main.get_orchestrator") as mock_orch:
+        with patch("agents.orchestrator.get_orchestrator") as mock_orch:
             mock_orch.return_value.run.return_value = mock_orchestrator_result
             response = client.post(
                 "/analyze",
@@ -126,7 +126,7 @@ class TestAnalyzeEndpoint:
         client,
         mock_orchestrator_result,
     ):
-        with patch("api.main.get_orchestrator") as mock_orch:
+        with patch("agents.orchestrator.get_orchestrator") as mock_orch:
             mock_orch.return_value.run.return_value = mock_orchestrator_result
             response = client.post(
                 "/analyze",
