@@ -678,7 +678,33 @@ def main():
                 )
 
             st.markdown("---")
+            instances = report.get("bias_instances", [])
+            changes = [
+                {
+                    "Severity": inst.get("severity", ""),
+                    "Category": inst.get("category", "").replace("_", " "),
+                    "Before": inst.get("span", ""),
+                    "After": inst.get("rewrite_suggestion", ""),
+                    "Why Changed": inst.get("rewrite_explanation", ""),
+                }
+                for inst in instances
+                if (inst.get("span") and inst.get("rewrite_suggestion"))
+            ]
+
             st.markdown(f"**Bias instances eliminated:** {report.get('bias_instance_count', 0)}")
+            st.markdown("#### 🧾 Detailed Changes")
+
+            if changes:
+                st.dataframe(
+                    pd.DataFrame(changes),
+                    use_container_width=True,
+                    hide_index=True,
+                )
+            else:
+                st.info(
+                    "No per-instance rewrite details were returned for this run. "
+                    "A full debiased document is shown above."
+                )
         else:
             st.info("Run an analysis first to see the before/after comparison.")
 
