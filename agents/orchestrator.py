@@ -25,6 +25,7 @@ from typing_extensions import TypedDict
 from agents.analyzer_agent import AnalyzerAgent
 from agents.mitigator_agent import MitigatorAgent
 from agents.retriever_agent import RetrieverAgent
+from agents.rewrite_utils import build_full_document_rewrite
 from agents.scorer_agent import ScorerAgent
 from config.llm_router import build_llm
 from config.settings import get_settings
@@ -227,6 +228,7 @@ class BiasGuardOrchestrator:
             rewrites = agent.mitigate(
                 text=state["text"],
                 bias_instances=state["bias_instances"],
+                doc_type=state["doc_type"],
             )
             duration = (time.time() - t0) * 1000
             logger.info(
@@ -310,6 +312,11 @@ class BiasGuardOrchestrator:
             "bias_instance_count": len(enriched_instances),
             "bias_instances": enriched_instances,
             "category_summary": _summarize_by_category(enriched_instances),
+            "full_document_rewrite": build_full_document_rewrite(
+                text=state["text"],
+                bias_instances=enriched_instances,
+                rewrites=state.get("rewrites", []),
+            ),
             "performance": {
                 "total_duration_ms": round(total_duration, 2),
                 "retrieval_duration_ms": round(state["retrieval_duration_ms"], 2),

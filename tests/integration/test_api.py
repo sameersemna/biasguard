@@ -12,8 +12,10 @@ from fastapi.testclient import TestClient
 @pytest.fixture
 def client():
     """Create a test client with mocked dependencies."""
+    import bias_db.bias_db as bias_db_module
+
     with (
-        patch("bias_db.bias_db._bias_db_instance", MagicMock()),
+        patch.object(bias_db_module, "_bias_db_instance", MagicMock()),
         patch("agents.orchestrator._orchestrator", None),
     ):
         from api.main import app
@@ -43,6 +45,7 @@ def mock_orchestrator_result():
         "category_summary": {"GENDER_BIAS": {"count": 1, "high": 0, "medium": 1, "low": 0}},
         "document_summary": "Test summary",
         "most_critical_issues": [],
+        "full_document_rewrite": "We are looking for an exceptional developer.",
         "performance": {
             "total_duration_ms": 1000.0,
             "retrieval_duration_ms": 100.0,
@@ -117,6 +120,27 @@ class TestAnalyzeEndpoint:
         ]
         for field in required_fields:
             assert field in report, f"Missing field: {field}"
+
+    def test_analyze_response_includes_full_document_rewrite(
+        self,
+        client,
+        mock_orchestrator_result,
+    ):
+        with patch("api.main.get_orchestrator") as mock_orch:
+            mock_orch.return_value.run.return_value = mock_orchestrator_result
+            response = client.post(
+                "/analyze",
+                json={
+                    "text": "Looking for a young energetic rockstar to join our culture-fit team.",
+                    "doc_type": "job_description",
+                },
+            )
+
+        assert response.status_code == 200
+        report = response.json().get("report", {})
+        assert "full_document_rewrite" in report
+        assert isinstance(report.get("full_document_rewrite"), str)
+        assert report.get("full_document_rewrite")
 
 
 class TestExamplesEndpoint:

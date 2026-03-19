@@ -646,24 +646,35 @@ def main():
             st.markdown("### ⚖️ Before vs After Debiasing")
 
             report = st.session_state["last_report"]
-            original = st.session_state["last_input"]
-            rewritten = report.get("full_document_rewrite", "No rewrite available")
+            original = st.session_state["last_input"] or ""
+            rewritten = (
+                report.get("full_document_rewrite")
+                or report.get("debiased_document")
+                or report.get("rewritten_text")
+                or original
+            )
 
             col_before, col_after = st.columns(2)
             with col_before:
                 st.markdown("#### ❌ Original (with bias)")
-                st.markdown(
-                    f"<div style='background:rgba(231,76,60,0.05); padding:16px; border-radius:8px; "
-                    f"border:1px solid rgba(231,76,60,0.3); min-height:300px; white-space:pre-wrap;'>{original}</div>",
-                    unsafe_allow_html=True,
+                st.text_area(
+                    "Original document",
+                    value=str(original),
+                    height=320,
+                    key="compare_original",
+                    disabled=True,
+                    label_visibility="collapsed",
                 )
 
             with col_after:
                 st.markdown("#### ✅ Debiased Version")
-                st.markdown(
-                    f"<div style='background:rgba(46,204,113,0.05); padding:16px; border-radius:8px; "
-                    f"border:1px solid rgba(46,204,113,0.3); min-height:300px; white-space:pre-wrap;'>{rewritten}</div>",
-                    unsafe_allow_html=True,
+                st.text_area(
+                    "Debiased document",
+                    value=str(rewritten),
+                    height=320,
+                    key="compare_rewritten",
+                    disabled=True,
+                    label_visibility="collapsed",
                 )
 
             st.markdown("---")
