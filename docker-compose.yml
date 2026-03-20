@@ -73,20 +73,6 @@ services:
       - phoenix_data:/root/.phoenix
     restart: unless-stopped
 
-  # ── Prometheus ────────────────────────────────────────────
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: biasguard-prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.retention.time=15d'
-    restart: unless-stopped
-
   # ── Grafana ───────────────────────────────────────────────
   grafana:
     image: grafana/grafana:latest
@@ -100,14 +86,11 @@ services:
       - grafana_data:/var/lib/grafana
       - ./docker/grafana/datasources:/etc/grafana/provisioning/datasources
       - ./docker/grafana/dashboards:/etc/grafana/provisioning/dashboards
-    depends_on:
-      - prometheus
     restart: unless-stopped
 
 volumes:
   chroma_data:
   phoenix_data:
-  prometheus_data:
   grafana_data:
 
 networks:

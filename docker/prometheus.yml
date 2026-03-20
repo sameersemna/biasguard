@@ -1,6 +1,8 @@
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
+  external_labels:
+    monitor: codelab-monitor
 
 scrape_configs:
   - job_name: prometheus
@@ -10,4 +12,4 @@ scrape_configs:
   - job_name: biasguard-api
     metrics_path: /metrics
     static_configs:
-      - targets: ["api:8000"]
+      - targets: ["promaxgb10-6116:8000"]

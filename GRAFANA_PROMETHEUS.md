@@ -6,7 +6,7 @@ This project can auto-provision a Prometheus datasource in Grafana on container 
 
 - Datasource name: `Prometheus`
 - Datasource UID: `prometheus`
-- URL inside Docker network: `http://prometheus:9090`
+- URL: `http://latitude:9090`
 - File: `docker/grafana/datasources/prometheus.yml`
 
 ## Compose wiring
@@ -32,6 +32,8 @@ Default login in this repo:
 - Password: `biasguard`
 
 Go to **Connections → Data sources** and verify that `Prometheus` exists.
+
+Prometheus is expected to run outside this Docker Compose stack at `http://latitude:9090`.
 
 ## Existing Grafana volume behavior
 
@@ -59,8 +61,7 @@ If `up` returns series, Grafana ↔ Prometheus is connected.
   - Check container mount paths in `docker-compose.yml`.
   - Check provisioning file syntax in `docker/grafana/datasources/prometheus.yml`.
 - **Datasource exists but query fails**
-  - Ensure `prometheus` service is running: `docker compose ps`.
-  - Confirm Prometheus health: `http://localhost:9090/-/healthy`.
+  - Confirm external Prometheus health: `http://latitude:9090/-/healthy`.
 - **Changed provisioning but nothing updates**
   - Restart Grafana container: `docker compose restart grafana`.
   - If still stale, reset volume with `docker compose down -v`.
