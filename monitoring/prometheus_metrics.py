@@ -40,12 +40,14 @@ HIGH_SEVERITY_ALERTS = Counter(
 ACTIVE_ANALYSES = Gauge(
     "biasguard_active_analyses",
     "Number of analyses currently in progress",
+    multiprocess_mode="livesum",
 )
 
 # Knowledge base document count
 KB_DOCUMENT_COUNT = Gauge(
     "biasguard_kb_document_count",
     "Number of bias patterns in the knowledge base",
+    multiprocess_mode="max",
 )
 
 # LLM call counter

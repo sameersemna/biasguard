@@ -14,6 +14,7 @@ Production-grade REST API with:
 from __future__ import annotations
 
 import time
+import os
 from contextlib import asynccontextmanager
 
 import structlog
@@ -21,6 +22,7 @@ from fastapi import FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
+from prometheus_client import CollectorRegistry, multiprocess as prom_multiprocess
 
 from api.models import (
     AnalyzeRequest,
@@ -65,6 +67,7 @@ async def lifespan(app: FastAPI):
         db = get_bias_db()
         stats = db.get_collection_stats()
         logger.info("vector_db_ready", **stats)
+        KB_DOCUMENT_COUNT.set(stats.get("document_count", 0))
 
         # Auto-ingest if collection is empty
         if stats.get("document_count", 0) == 0:
@@ -158,7 +161,13 @@ async def health_check():
 @app.get("/metrics", tags=["System"])
 async def metrics() -> Response:
     """Prometheus metrics endpoint."""
-    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
+    if "PROMETHEUS_MULTIPROC_DIR" in os.environ:
+        registry = CollectorRegistry()
+        prom_multiprocess.MultiProcessCollector(registry)
+        data = generate_latest(registry)
+    else:
+        data = generate_latest()
+    return Response(content=data, media_type=CONTENT_TYPE_LATEST)
 
 
 @app.get("/kb/stats", response_model=KBStatsResponse, tags=["Knowledge Base"])

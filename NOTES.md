@@ -1,0 +1,2 @@
+list all the docker images/containers/volumes that our project needs now, check if all of them that were created earlier and not needed by our project right now are removed
+dont touch docker images/containers/volumes of other projects
