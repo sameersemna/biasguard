@@ -24,7 +24,17 @@ GRAFANA_PASSWORD='<admin-password>' \
 bash scripts/import_dashboards_to_latitude_grafana.sh
 ```
 
-The script imports all JSON files from `monitoring/grafana_dashboards/` and overwrites existing dashboards with the same UID.
+The script imports all JSON files from `monitoring/grafana_dashboards/` into folder `BiasGuard` and overwrites existing dashboards with the same UID.
+If folder `BiasGuard` does not exist, it is created automatically.
+
+Optional override:
+
+```bash
+GRAFANA_FOLDER='BiasGuard' \
+GRAFANA_USER=<admin-user> \
+GRAFANA_PASSWORD='<admin-password>' \
+bash scripts/import_dashboards_to_latitude_grafana.sh
+```
 
 ## Quick validation
 
