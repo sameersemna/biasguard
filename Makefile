@@ -54,7 +54,7 @@ docker-up:
 	@echo "✅ BiasGuard stack started:"
 	@echo "   API:       http://localhost:8000/docs"
 	@echo "   Frontend:  http://localhost:8501"
-	@echo "   Grafana:   http://localhost:3000 (admin/biasguard)"
+	@echo "   Grafana:   http://latitude:3000 (centralized)"
 	@echo "   Phoenix:   http://localhost:6006"
 
 docker-down:

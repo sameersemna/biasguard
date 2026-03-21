@@ -1,67 +1,43 @@
-# Grafana + Prometheus Guide
+# Centralized Grafana + Prometheus Guide
 
-This project can auto-provision a Prometheus datasource in Grafana on container startup.
+BiasGuard now uses shared observability services on latitude:
 
-## What is provisioned
+- Grafana: `http://latitude:3000`
+- Prometheus: `http://latitude:9090`
 
-- Datasource name: `Prometheus`
-- Datasource UID: `prometheus`
-- URL: `http://latitude:9090`
-- File: `docker/grafana/datasources/prometheus.yml`
+No Grafana or Prometheus container is started by BiasGuard `docker-compose.yml`.
 
-## Compose wiring
+## Dashboards in this repo
 
-Grafana mounts provisioning folders from the repo:
+Dashboard JSON files are stored in:
 
-- `./docker/grafana/datasources` → `/etc/grafana/provisioning/datasources`
-- `./docker/grafana/dashboards` → `/etc/grafana/provisioning/dashboards`
+- `monitoring/grafana_dashboards/LLM_Operations.json`
+- `monitoring/grafana_dashboards/Observability.json`
 
-## First startup (fresh)
+## Import dashboards to centralized Grafana
 
-Run:
+Use:
 
 ```bash
-docker compose up --build -d
+GRAFANA_USER=<admin-user> \
+GRAFANA_PASSWORD='<admin-password>' \
+bash scripts/import_dashboards_to_latitude_grafana.sh
 ```
 
-Then open Grafana at `http://localhost:3000`.
-
-Default login in this repo:
-
-- User: `admin`
-- Password: `biasguard`
-
-Go to **Connections → Data sources** and verify that `Prometheus` exists.
-
-Prometheus is expected to run outside this Docker Compose stack at `http://latitude:9090`.
-
-## Existing Grafana volume behavior
-
-Provisioning runs at Grafana startup. If you already had a populated `grafana_data` volume, UI state may persist from older runs.
-
-To force a clean Grafana state:
-
-```bash
-docker compose down -v
-docker compose up --build -d
-```
+The script imports all JSON files from `monitoring/grafana_dashboards/` and overwrites existing dashboards with the same UID.
 
 ## Quick validation
 
-1. Grafana: **Explore**
-2. Datasource: `Prometheus`
-3. Query: `up`
-4. Run query
-
-If `up` returns series, Grafana ↔ Prometheus is connected.
+1. Open Grafana at `http://latitude:3000`.
+2. Open one imported BiasGuard dashboard.
+3. In Explore, run `up{job="biasguard-api"}` against datasource `Prometheus`.
+4. Ensure series are returned.
 
 ## Troubleshooting
 
-- **Datasource missing**
-  - Check container mount paths in `docker-compose.yml`.
-  - Check provisioning file syntax in `docker/grafana/datasources/prometheus.yml`.
-- **Datasource exists but query fails**
-  - Confirm external Prometheus health: `http://latitude:9090/-/healthy`.
-- **Changed provisioning but nothing updates**
-  - Restart Grafana container: `docker compose restart grafana`.
-  - If still stale, reset volume with `docker compose down -v`.
+- **Unauthorized during import**
+  - Verify `GRAFANA_USER` and `GRAFANA_PASSWORD` for latitude Grafana.
+- **Dashboard imports but panels show no data**
+  - Verify datasource `Prometheus` exists in latitude Grafana.
+  - Verify Prometheus health: `http://latitude:9090/-/healthy`.
+  - Verify target status: `http://latitude:9090/api/v1/targets`.

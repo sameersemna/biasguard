@@ -262,13 +262,13 @@ cp .env.example .env
 ### 2. Run with Docker (Recommended)
 
 ```bash
-# Start services (API + Frontend + Grafana + Phoenix)
+# Start services (API + Frontend + Phoenix)
 docker compose up --build
 
 # API:       http://localhost:8000
 # Frontend:  http://localhost:8501
-# Grafana:   http://localhost:3000
 # Phoenix:   http://localhost:6006
+# Grafana (centralized):   http://latitude:3000
 # Prometheus (external): http://latitude:9090
 ```
 

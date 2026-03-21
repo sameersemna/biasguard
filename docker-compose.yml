@@ -1,6 +1,6 @@
 # ============================================================
 # BiasGuard — Docker Compose
-# Local development stack: API + Frontend + Monitoring
+# Local development stack: API + Frontend + Phoenix
 # ============================================================
 
 services:
@@ -74,25 +74,9 @@ services:
       - phoenix_data:/root/.phoenix
     restart: unless-stopped
 
-  # ── Grafana ───────────────────────────────────────────────
-  grafana:
-    image: grafana/grafana:latest
-    container_name: biasguard-grafana
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=biasguard
-      - GF_USERS_ALLOW_SIGN_UP=false
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./docker/grafana/datasources:/etc/grafana/provisioning/datasources
-      - ./docker/grafana/dashboards:/etc/grafana/provisioning/dashboards
-    restart: unless-stopped
-
 volumes:
   chroma_data:
   phoenix_data:
-  grafana_data:
 
 networks:
   default:
