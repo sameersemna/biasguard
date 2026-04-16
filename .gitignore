@@ -46,3 +46,4 @@ config/logging.json
 presentation/*.py
 presentation/README.md
 presentation/requirements.txt
+nordvpn_meshnet.txt

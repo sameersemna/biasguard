@@ -1,0 +1,6 @@
+[server]
+enableCORS = false
+enableXsrfProtection = false
+baseUrlPath = ""
+# If you are accessing via https, ensure this is true
+headless = true
