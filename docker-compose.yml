@@ -54,13 +54,11 @@ services:
     ports:
       - "8501:8501"
     environment:
-      - STREAMLIT_API_BASE_URL=http://api:8000
+      - STREAMLIT_API_BASE_URL=${STREAMLIT_API_BASE_URL:-http://api:8000}
       - STREAMLIT_SERVER_FILE_WATCHER_TYPE=poll
     volumes:
       - ./frontend:/app/frontend
       - ./frontend/.streamlit:/app/.streamlit
-    depends_on:
-      - api
     restart: unless-stopped
 
   # ── Arize Phoenix (LLM Observability) ────────────────────

@@ -2,3 +2,7 @@
 enableCORS = false
 enableXsrfProtection = false
 headless = true
+
+[browser]
+serverAddress = "biasguard.prufai.de"
+serverPort = 443
