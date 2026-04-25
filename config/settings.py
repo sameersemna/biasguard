@@ -9,7 +9,7 @@ from enum import StrEnum
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -117,6 +117,15 @@ class Settings(BaseSettings):
     @classmethod
     def ensure_path(cls, v: str | Path) -> Path:
         return Path(v)
+
+    @model_validator(mode="after")
+    def validate_production_secrets(self) -> "Settings":
+        if not self.api_debug and self.api_secret_key.startswith("change-me"):
+            raise ValueError(
+                "api_secret_key must be changed from the default value in production. "
+                "Generate one with: openssl rand -hex 32"
+            )
+        return self
 
     def get_allowed_origins(self) -> list[str]:
         return [origin.strip() for origin in self.allowed_origins.split(",") if origin.strip()]

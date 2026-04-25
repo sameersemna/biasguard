@@ -43,6 +43,10 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 1g
     restart: unless-stopped
 
   # ── Streamlit Frontend ────────────────────────────────────
@@ -59,6 +63,19 @@ services:
     volumes:
       - ./frontend:/app/frontend
       - ./frontend/.streamlit:/app/.streamlit
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8501/_stcore/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 512m
     restart: unless-stopped
 
   # ── Arize Phoenix (LLM Observability) ────────────────────
@@ -70,6 +87,10 @@ services:
       - "4317:4317"   # OTLP gRPC
     volumes:
       - phoenix_data:/root/.phoenix
+    deploy:
+      resources:
+        limits:
+          memory: 512m
     restart: unless-stopped
 
 volumes:

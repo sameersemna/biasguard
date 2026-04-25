@@ -15,10 +15,11 @@ from __future__ import annotations
 
 import time
 import os
+import uuid
 from contextlib import asynccontextmanager
 
 import structlog
-from fastapi import FastAPI, Request, Response, status
+from fastapi import FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
@@ -106,19 +107,22 @@ app.add_middleware(
     allow_origins=settings.get_allowed_origins(),
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["*"],
+    allow_headers=["Content-Type", "Authorization", "X-Request-ID", "X-API-Key"],
 )
 
 
 @app.middleware("http")
 async def logging_middleware(request: Request, call_next):
-    """Log all requests with timing."""
+    """Log all requests with timing and attach X-Request-ID to responses."""
+    request_id = str(uuid.uuid4())
     t0 = time.time()
     response = await call_next(request)
     duration = (time.time() - t0) * 1000
 
+    response.headers["X-Request-ID"] = request_id
     logger.info(
         "http_request",
+        request_id=request_id,
         method=request.method,
         path=request.url.path,
         status_code=response.status_code,
@@ -246,11 +250,19 @@ async def analyze_document(request: AnalyzeRequest):
         report = BiasGuardReport(**report_dict)
         return AnalyzeResponse(success=True, report=report)
 
+    except HTTPException:
+        raise
+    except (RuntimeError, ValueError, KeyError) as e:
+        logger.error("analyze_pipeline_failed", error=str(e), exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Analysis pipeline failed: {str(e)}",
+        )
     except Exception as e:
-        logger.error("analyze_failed", error=str(e), exc_info=True)
-        return AnalyzeResponse(
-            success=False,
-            error=f"Analysis failed: {str(e)}",
+        logger.error("analyze_unexpected_error", error=str(e), exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred during analysis.",
         )
     finally:
         ACTIVE_ANALYSES.dec()
