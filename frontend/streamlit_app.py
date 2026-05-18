@@ -546,37 +546,114 @@ def render_highlighted_document(text: str, terms_with_colors: list[tuple[str, st
     )
 
 
-def extract_text_from_uploaded_file(uploaded_file) -> str | None:
-    """Extract text from uploaded TXT, PDF, or DOCX files."""
-    file_name = (uploaded_file.name or "").lower()
+def extract_text_from_uploaded_file(uploaded_file) -> dict | None:
+    """
+    Extract text from an uploaded TXT, PDF, or DOCX file.
+
+    Strategy:
+      1. Try the backend ``/upload`` endpoint (robust tiered parsing).
+      2. Fall back to local pypdf / python-docx if the API is offline.
+
+    Returns a dict with keys:
+      text, word_count, extraction_method, warning, is_ocr, filename
+    or a dict with ``error`` key on failure.
+    """
+    file_name = uploaded_file.name or ""
+    file_name_lower = file_name.lower()
     file_bytes = uploaded_file.getvalue()
 
+    # ── 1. Backend extraction (preferred) ────────────────────────────────
     try:
-        if file_name.endswith(".txt") or uploaded_file.type == "text/plain":
-            return file_bytes.decode("utf-8", errors="ignore").strip()
+        with httpx.Client(timeout=60.0) as client:
+            resp = client.post(
+                f"{API_BASE}/upload",
+                files={"file": (file_name, file_bytes, uploaded_file.type or "application/octet-stream")},
+            )
+        if resp.status_code == 200:
+            return resp.json()
+        if resp.status_code == 422:
+            detail = resp.json().get("detail", "Could not extract text from file.")
+            return {"text": "", "error": detail, "filename": file_name}
+    except Exception:
+        pass  # API offline or unreachable — fall through to local extraction
 
-        if file_name.endswith(".pdf"):
+    # ── 2. Local extraction fallback ──────────────────────────────────────
+    try:
+        if file_name_lower.endswith(".txt") or uploaded_file.type == "text/plain":
+            try:
+                text = file_bytes.decode("utf-8").strip()
+            except UnicodeDecodeError:
+                text = file_bytes.decode("latin-1", errors="ignore").strip()
+            return {
+                "text": text,
+                "word_count": len(text.split()),
+                "extraction_method": "local-txt",
+                "warning": None,
+                "is_ocr": False,
+                "filename": file_name,
+            }
+
+        if file_name_lower.endswith(".pdf"):
             from pypdf import PdfReader
 
             reader = PdfReader(BytesIO(file_bytes))
-            text = "\n".join((page.extract_text() or "") for page in reader.pages)
-            return text.strip()
+            text = "\n".join((page.extract_text() or "") for page in reader.pages).strip()
+            word_count = len(text.split())
+            warning = None
+            if word_count < 20:
+                warning = (
+                    "Very little text was extracted from this PDF. "
+                    "It may be image-based or scanned. "
+                    "For better results, use a text-based PDF or paste the text directly."
+                )
+            return {
+                "text": text,
+                "word_count": word_count,
+                "extraction_method": "local-pypdf",
+                "warning": warning,
+                "is_ocr": False,
+                "filename": file_name,
+            }
 
-        if file_name.endswith(".docx"):
+        if file_name_lower.endswith(".docx"):
             from docx import Document
 
             document = Document(BytesIO(file_bytes))
-            text = "\n".join(paragraph.text for paragraph in document.paragraphs)
-            return text.strip()
+            paragraphs: list[str] = [
+                para.text for para in document.paragraphs if para.text.strip()
+            ]
+            # Also extract table cells (missed by plain paragraph iteration)
+            for table in document.tables:
+                for row in table.rows:
+                    row_text = " | ".join(
+                        cell.text.strip() for cell in row.cells if cell.text.strip()
+                    )
+                    if row_text:
+                        paragraphs.append(row_text)
+            text = "\n".join(paragraphs).strip()
+            return {
+                "text": text,
+                "word_count": len(text.split()),
+                "extraction_method": "local-python-docx",
+                "warning": None,
+                "is_ocr": False,
+                "filename": file_name,
+            }
 
-        st.error("Unsupported file type. Please upload TXT, PDF, or DOCX.")
-        return None
+        return {
+            "text": "",
+            "error": "Unsupported file type. Please upload TXT, PDF, or DOCX.",
+            "filename": file_name,
+        }
+
     except ImportError:
-        st.error("Missing parser dependency for this file type. Please reinstall frontend dependencies.")
-        return None
-    except Exception as error:
-        st.error(f"Could not extract text from uploaded file: {error}")
-        return None
+        return {
+            "text": "",
+            "error": "Missing parser library. Please reinstall frontend dependencies.",
+            "filename": file_name,
+        }
+    except Exception as exc:
+        return {"text": "", "error": f"Could not extract text: {exc}", "filename": file_name}
 
 
 # ─── Main App ──────────────────────────────────────────────────────────────
@@ -678,10 +755,42 @@ def main():
             )
 
             if uploaded_file:
-                extracted_text = extract_text_from_uploaded_file(uploaded_file)
-                if extracted_text:
+                with st.spinner(f"Extracting text from {uploaded_file.name}…"):
+                    extraction = extract_text_from_uploaded_file(uploaded_file)
+
+                if extraction and extraction.get("text"):
+                    extracted_text = extraction["text"]
                     input_text = extracted_text
                     st.session_state["input_text"] = extracted_text
+
+                    _method = extraction.get("extraction_method", "")
+                    _wc = extraction.get("word_count", len(extracted_text.split()))
+                    _ocr = extraction.get("is_ocr", False)
+                    _warn = extraction.get("warning")
+
+                    _col1, _col2 = st.columns(2)
+                    _col1.caption(f"📄 **{uploaded_file.name}**")
+                    _col2.caption(
+                        f"🔧 `{_method}` · {_wc:,} words"
+                        + (" *(OCR)*" if _ocr else "")
+                    )
+                    if _warn:
+                        st.warning(_warn)
+
+                    with st.expander("👁️ Preview & edit extracted text", expanded=False):
+                        _edited = st.text_area(
+                            "Edit the extracted text if needed before analyzing:",
+                            value=extracted_text,
+                            height=220,
+                            key="upload_preview_edit",
+                        )
+                        if _edited != extracted_text:
+                            input_text = _edited
+                            st.session_state["input_text"] = _edited
+                            st.caption("✏️ Using your edited version.")
+
+                elif extraction and extraction.get("error"):
+                    st.error(f"❌ {extraction['error']}")
                 else:
                     st.warning("No text could be extracted from the uploaded file.")
 

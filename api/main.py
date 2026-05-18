@@ -19,7 +19,7 @@ import uuid
 from contextlib import asynccontextmanager
 
 import structlog
-from fastapi import FastAPI, HTTPException, Request, Response, status
+from fastapi import FastAPI, File, HTTPException, Request, Response, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
@@ -266,6 +266,94 @@ async def analyze_document(request: AnalyzeRequest):
         )
     finally:
         ACTIVE_ANALYSES.dec()
+
+
+# ─── Document Upload ──────────────────────────────────────────────────────
+
+
+@app.post("/upload", tags=["Analysis"])
+async def upload_document(
+    file: UploadFile = File(...),
+    use_ocr: bool = False,
+):
+    """
+    Upload a hiring document (PDF, DOCX, TXT) and extract its text.
+
+    Returns the extracted text together with metadata (method used,
+    word count, warnings) so the caller can review it before submitting
+    to `/analyze`.
+
+    Supported formats: PDF (text-based and scanned+OCR), DOCX, TXT.
+    Maximum file size: 10 MB.
+    """
+    from api.document_parser import extract_text  # local import to keep startup fast
+
+    SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".txt"}
+    MAX_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
+
+    file_ext = os.path.splitext(file.filename or "")[1].lower()
+    if file_ext not in SUPPORTED_EXTENSIONS:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                f"Unsupported file extension '{file_ext}'. "
+                "Please upload a PDF, DOCX, or TXT file."
+            ),
+        )
+
+    file_bytes = await file.read()
+    if len(file_bytes) > MAX_SIZE_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="File too large. Maximum allowed size is 10 MB.",
+        )
+
+    logger.info(
+        "upload_request",
+        filename=file.filename,
+        content_type=file.content_type,
+        size_bytes=len(file_bytes),
+        use_ocr=use_ocr,
+    )
+
+    result = extract_text(
+        file_bytes=file_bytes,
+        file_name=file.filename or "",
+        content_type=file.content_type,
+        use_ocr=use_ocr,
+    )
+
+    if not result.text:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=result.warning or "Could not extract text from the uploaded file.",
+        )
+
+    if result.word_count < 5:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                "Extracted text is too short (fewer than 5 words). "
+                "The file may be image-based, encrypted, or empty."
+            ),
+        )
+
+    logger.info(
+        "upload_success",
+        filename=file.filename,
+        method=result.method,
+        word_count=result.word_count,
+        is_ocr=result.is_ocr,
+    )
+
+    return {
+        "text": result.text,
+        "filename": file.filename,
+        "word_count": result.word_count,
+        "extraction_method": result.method,
+        "is_ocr": result.is_ocr,
+        "warning": result.warning,
+    }
 
 
 @app.get("/examples", tags=["Examples"])
